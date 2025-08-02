@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique(map: "User_email_key")
+  password  String
+  role      user_role @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+
+}
+model Customer {
+  Customer_ID      String   @id @db.Char(10)
+  Customer_Name    String   @db.VarChar(20)
+  Customer_Lastname String  @db.VarChar(20)
+  Customer_Tel     String   @db.Char(10)
+  Customer_Room    String   @db.VarChar(10)
+  Customer_Car     String   @db.VarChar(20)
+  Customer_Address String   @db.VarChar(150)
+  ContractNo       String   @db.VarChar(20)
+  DateCheckin      DateTime
+  DateOut          DateTime
+
+  Payments         Payment[]
+  Repairs          Repair[]
+}
+
+model Employee {
+  Emp_ID       String  @id @db.Char(10)
+  Emp_Name     String  @db.VarChar(20)
+  Emp_Lastname String  @db.VarChar(20)
+  Emp_Tel      String  @db.Char(10)
+  Emp_Address  String  @db.VarChar(150)
+  Emp_Salary   Int
+}
+
+model Admin {
+  Admin_ID       String  @id @db.Char(10)
+  Admin_Name     String  @db.VarChar(50)
+  Admin_Lastname String  @db.VarChar(50)
+  Admin_Tel      String  @db.Char(10)
+  Admin_Address  String  @db.VarChar(150)
+  Admin_Salary   Int
+}
+model Customer {
+  Customer_ID      String   @id @db.Char(10)
+  Customer_Name    String   @db.VarChar(20)
+  Customer_Lastname String  @db.VarChar(20)
+  Customer_Tel     String   @db.Char(10)
+  Customer_Room    String   @db.VarChar(10)
+  Customer_Car     String   @db.VarChar(20)
+  Customer_Address String   @db.VarChar(150)
+  ContractNo       String   @db.VarChar(20)
+  DateCheckin      DateTime
+  DateOut          DateTime
+
+  Payments         Payment[]
+  Repairs          Repair[]
+}
+
+// ตารางข้อมูลพนักงาน
+model Employee {
+  Emp_ID       String  @id @db.Char(10)
+  Emp_Name     String  @db.VarChar(20)
+  Emp_Lastname String  @db.VarChar(20)
+  Emp_Tel      String  @db.Char(10)
+  Emp_Address  String  @db.VarChar(150)
+  Emp_Salary   Int
+}
+
+// ตารางข้อมูลแอดมิน
+model Admin {
+  Admin_ID       String  @id @db.Char(10)
+  Admin_Name     String  @db.VarChar(50)
+  Admin_Lastname String  @db.VarChar(50)
+  Admin_Tel      String  @db.Char(10)
+  Admin_Address  String  @db.VarChar(150)
+  Admin_Salary   Int
+}
+
+// ตารางข้อมูลค่าใช้จ่าย
+model Payment {
+  Pay_ID         String   @id @db.Char(10)
+  Customer_Room  String   @db.VarChar(10)
+  Month          String   @db.VarChar(20)
+  Year           Int
+  Rental         Int
+  WaterSupply    Int
+  TotalWater     Int
+  ElectricitySupply Int
+  TotalElec      Int
+  Internet       Int
+  Other          Int
+  FineDay        Int
+  TotalFine      Int
+  Paid           Int
+  TotalRental    Int
+  DayPaid        DateTime
+
+  customer       Customer @relation(fields: [Customer_Room], references: [Customer_Room])
+}
+
+// ตารางข้อมูลอัตราราคาคงที่
+model FixedRate {
+  Rental    Int
+  Electcity Int
+  Water     Int
+  Fines     Int
+}
+
+// ตารางแจ้งซ่อม
+model Repair {
+  Customer_ID    String   @db.Char(10)
+  Customer_Room  String   @db.VarChar(10)
+  Reason         String   @db.Char(200)
+
+  customer       Customer @relation(fields: [Customer_ID], references: [Customer_ID])
+
+  @@id([Customer_ID])
+}
+
+
+
+enum user_role {
+  ADMIN
+  USER
+}
