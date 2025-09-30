@@ -7,128 +7,282 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ตารางผู้ใช้ระบบ
 model user {
   id        Int       @id @default(autoincrement())
   email     String    @unique(map: "User_email_key")
   password  String
   role      user_role @default(USER)
   createdAt DateTime  @default(now())
-  updatedAt DateTime
-
+  updatedAt DateTime  @updatedAt
 }
+
+// ตารางข้อมูลลูกค้า/ผู้เช่า
 model Customer {
-  Customer_ID      String   @id @db.Char(10)
-  Customer_Name    String   @db.VarChar(20)
-  Customer_Lastname String  @db.VarChar(20)
-  Customer_Tel     String   @db.Char(10)
-  Customer_Room    String   @db.VarChar(10)
-  Customer_Car     String   @db.VarChar(20)
-  Customer_Address String   @db.VarChar(150)
-  ContractNo       String   @db.VarChar(20)
-  DateCheckin      DateTime
-  DateOut          DateTime
+  Customer_ID       String    @id @db.Char(10)
+  Customer_Name     String    @db.VarChar(20)
+  Customer_Lastname String    @db.VarChar(20)
+  Customer_Tel      String    @db.Char(10)
+  Customer_Room     String    @unique @db.VarChar(10)
+  Customer_Car      String    @db.VarChar(20)
+  Customer_Address  String    @db.VarChar(150)
+  ContractNo        String    @unique @db.VarChar(20)
+  DateCheckin       DateTime
+  DateOut           DateTime?
+  Status            String    @default("active") @db.VarChar(20) // active, inactive, moved_out
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  Payments         Payment[]
-  Repairs          Repair[]
+  Payments          Payment[]
+  Repairs           Repair[]
+  room              Room?     @relation(fields: [Customer_Room], references: [Room_Number])
 }
 
-model Employee {
-  Emp_ID       String  @id @db.Char(10)
-  Emp_Name     String  @db.VarChar(20)
-  Emp_Lastname String  @db.VarChar(20)
-  Emp_Tel      String  @db.Char(10)
-  Emp_Address  String  @db.VarChar(150)
-  Emp_Salary   Int
-}
+// ตารางห้องพัก
+model Room {
+  Room_Number     String     @id @db.VarChar(10)
+  Room_Type       String     @db.VarChar(20) // มาตรฐาน, ดีลักซ์, VIP
+  Room_Floor      Int
+  Room_Size       Float      // ขนาดห้อง ตร.ม.
+  Room_Status     RoomStatus @default(AVAILABLE)
+  Room_Price      Int        // ค่าเช่าต่อเดือน
+  Room_Deposit    Int        // เงินประกัน
+  Description     String?    @db.Text
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
-model Admin {
-  Admin_ID       String  @id @db.Char(10)
-  Admin_Name     String  @db.VarChar(50)
-  Admin_Lastname String  @db.VarChar(50)
-  Admin_Tel      String  @db.Char(10)
-  Admin_Address  String  @db.VarChar(150)
-  Admin_Salary   Int
-}
-model Customer {
-  Customer_ID      String   @id @db.Char(10)
-  Customer_Name    String   @db.VarChar(20)
-  Customer_Lastname String  @db.VarChar(20)
-  Customer_Tel     String   @db.Char(10)
-  Customer_Room    String   @db.VarChar(10)
-  Customer_Car     String   @db.VarChar(20)
-  Customer_Address String   @db.VarChar(150)
-  ContractNo       String   @db.VarChar(20)
-  DateCheckin      DateTime
-  DateOut          DateTime
-
-  Payments         Payment[]
-  Repairs          Repair[]
+  Customers       Customer[]
+  Maintenances    Maintenance[]
 }
 
 // ตารางข้อมูลพนักงาน
 model Employee {
-  Emp_ID       String  @id @db.Char(10)
-  Emp_Name     String  @db.VarChar(20)
-  Emp_Lastname String  @db.VarChar(20)
-  Emp_Tel      String  @db.Char(10)
-  Emp_Address  String  @db.VarChar(150)
+  Emp_ID       String   @id @db.Char(10)
+  Emp_Name     String   @db.VarChar(20)
+  Emp_Lastname String   @db.VarChar(20)
+  Emp_Tel      String   @db.Char(10)
+  Emp_Address  String   @db.VarChar(150)
   Emp_Salary   Int
+  Emp_Position String   @db.VarChar(50) // แม่บ้าน, รปภ., ช่างซ่อม
+  Emp_Status   String   @default("active") @db.VarChar(20)
+  DateHired    DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  Maintenances Maintenance[]
 }
 
 // ตารางข้อมูลแอดมิน
 model Admin {
-  Admin_ID       String  @id @db.Char(10)
-  Admin_Name     String  @db.VarChar(50)
-  Admin_Lastname String  @db.VarChar(50)
-  Admin_Tel      String  @db.Char(10)
-  Admin_Address  String  @db.VarChar(150)
+  Admin_ID       String   @id @db.Char(10)
+  Admin_Name     String   @db.VarChar(50)
+  Admin_Lastname String   @db.VarChar(50)
+  Admin_Tel      String   @db.Char(10)
+  Admin_Address  String   @db.VarChar(150)
   Admin_Salary   Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
-// ตารางข้อมูลค่าใช้จ่าย
+// ตารางค่าใช้จ่าย/ใบแจ้งหนี้
 model Payment {
-  Pay_ID         String   @id @db.Char(10)
-  Customer_Room  String   @db.VarChar(10)
-  Month          String   @db.VarChar(20)
-  Year           Int
-  Rental         Int
-  WaterSupply    Int
-  TotalWater     Int
-  ElectricitySupply Int
-  TotalElec      Int
-  Internet       Int
-  Other          Int
-  FineDay        Int
-  TotalFine      Int
-  Paid           Int
-  TotalRental    Int
-  DayPaid        DateTime
+  Pay_ID            String        @id @db.Char(10)
+  Customer_Room     String        @db.VarChar(10)
+  Month             String        @db.VarChar(20)
+  Year              Int
+  Rental            Int           // ค่าเช่า
+  WaterSupply       Int           // มิเตอร์น้ำ
+  TotalWater        Int           // ค่าน้ำรวม
+  ElectricitySupply Int           // มิเตอร์ไฟ
+  TotalElec         Int           // ค่าไฟรวม
+  Internet          Int           // ค่าเน็ต
+  Other             Int           // ค่าอื่นๆ
+  FineDay           Int           // จำนวนวันที่เกิน
+  TotalFine         Int           // ค่าปรับรวม
+  Paid              Int           // จำนวนเงินที่จ่าย
+  TotalRental       Int           // ยอดรวมทั้งหมด
+  PaymentStatus     PaymentStatus @default(UNPAID)
+  DayPaid           DateTime?
+  DueDate           DateTime      // วันครบกำหนดชำระ
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
-  customer       Customer @relation(fields: [Customer_Room], references: [Customer_Room])
+  customer          Customer      @relation(fields: [Customer_Room], references: [Customer_Room])
 }
 
-// ตารางข้อมูลอัตราราคาคงที่
+// ตารางอัตราราคาคงที่
 model FixedRate {
-  Rental    Int
-  Electcity Int
-  Water     Int
-  Fines     Int
+  id              Int      @id @default(autoincrement())
+  Rental          Int      // ค่าเช่าพื้นฐาน
+  Electricity     Int      // ค่าไฟต่อหน่วย
+  Water           Int      // ค่าน้ำต่อหน่วย
+  Fines           Int      // ค่าปรับต่อวัน
+  Internet        Int      // ค่าเน็ต
+  Parking         Int      // ค่าจอดรถ
+  KeyCard         Int      // ค่าทำบัตร
+  Deposit         Int      // เงินประกัน
+  EffectiveDate   DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 // ตารางแจ้งซ่อม
 model Repair {
-  Customer_ID    String   @db.Char(10)
-  Customer_Room  String   @db.VarChar(10)
-  Reason         String   @db.Char(200)
+  Repair_ID      String       @id @default(cuid())
+  Customer_ID    String       @db.Char(10)
+  Customer_Room  String       @db.VarChar(10)
+  Reason         String       @db.Text
+  RepairType     String       @db.VarChar(50) // ไฟฟ้า, ประปา, เฟอร์นิเจอร์, อื่นๆ
+  Status         RepairStatus @default(PENDING)
+  Priority       String       @default("normal") @db.VarChar(20) // urgent, normal, low
+  ReportDate     DateTime     @default(now())
+  CompletedDate  DateTime?
+  Cost           Int?
+  Note           String?      @db.Text
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  customer       Customer @relation(fields: [Customer_ID], references: [Customer_ID])
-
-  @@id([Customer_ID])
+  customer       Customer     @relation(fields: [Customer_ID], references: [Customer_ID])
 }
 
+// ตารางการซ่อมบำรุง (ซ่อมห้อง/อาคาร)
+model Maintenance {
+  Maintenance_ID String   @id @default(cuid())
+  Room_Number    String?  @db.VarChar(10)
+  Emp_ID         String?  @db.Char(10)
+  MainType       String   @db.VarChar(50) // ซ่อมห้อง, ซ่อมส่วนกลาง
+  Description    String   @db.Text
+  Cost           Int
+  MainDate       DateTime
+  Status         String   @default("completed") @db.VarChar(20)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
+  room           Room?     @relation(fields: [Room_Number], references: [Room_Number])
+  employee       Employee? @relation(fields: [Emp_ID], references: [Emp_ID])
+}
 
+// ตารางสัญญาเช่า
+model Contract {
+  Contract_ID     String   @id @db.VarChar(20)
+  Customer_ID     String   @db.Char(10)
+  Room_Number     String   @db.VarChar(10)
+  StartDate       DateTime
+  EndDate         DateTime
+  Deposit         Int      // เงินประกัน
+  MonthlyRent     Int      // ค่าเช่าต่อเดือน
+  Status          String   @default("active") @db.VarChar(20) // active, expired, terminated
+  ContractFile    String?  @db.VarChar(255) // path to file
+  TermsConditions String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ตารางมิเตอร์น้ำ-ไฟ
+model MeterReading {
+  Reading_ID      String   @id @default(cuid())
+  Room_Number     String   @db.VarChar(10)
+  Month           String   @db.VarChar(20)
+  Year            Int
+  WaterPrevious   Int      // มิเตอร์น้ำเดือนก่อน
+  WaterCurrent    Int      // มิเตอร์น้ำปัจจุบัน
+  WaterUsed       Int      // หน่วยน้ำที่ใช้
+  ElecPrevious    Int      // มิเตอร์ไฟเดือนก่อน
+  ElecCurrent     Int      // มิเตอร์ไฟปัจจุบัน
+  ElecUsed        Int      // หน่วยไฟที่ใช้
+  ReadDate        DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ตารางประกาศ/ข่าวสาร
+model Announcement {
+  Announce_ID   String   @id @default(cuid())
+  Title         String   @db.VarChar(100)
+  Content       String   @db.Text
+  Type          String   @db.VarChar(20) // ข่าว, ประกาศ, แจ้งเตือน
+  Priority      String   @default("normal") @db.VarChar(20)
+  PostDate      DateTime @default(now())
+  ExpireDate    DateTime?
+  Status        String   @default("active") @db.VarChar(20)
+  ImageUrl      String?  @db.VarChar(255)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ตารางบันทึกผู้เข้า-ออก (Visitor Log)
+model VisitorLog {
+  Log_ID        String   @id @default(cuid())
+  Customer_Room String   @db.VarChar(10)
+  VisitorName   String   @db.VarChar(100)
+  VisitorTel    String?  @db.Char(10)
+  Purpose       String?  @db.VarChar(100)
+  CheckInTime   DateTime @default(now())
+  CheckOutTime  DateTime?
+  Note          String?  @db.Text
+  createdAt     DateTime @default(now())
+}
+
+// ตารางรายจ่าย (Expenses)
+model Expense {
+  Expense_ID    String   @id @default(cuid())
+  Category      String   @db.VarChar(50) // ค่าซ่อมแซม, ค่าน้ำ-ไฟส่วนกลาง, เงินเดือน
+  Description   String   @db.Text
+  Amount        Int
+  ExpenseDate   DateTime
+  PaidTo        String?  @db.VarChar(100)
+  Receipt       String?  @db.VarChar(255) // path to receipt image
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ตารางจองห้อง (Room Booking)
+model Booking {
+  Booking_ID    String        @id @default(cuid())
+  Room_Number   String        @db.VarChar(10)
+  CustomerName  String        @db.VarChar(100)
+  CustomerTel   String        @db.Char(10)
+  CustomerEmail String?       @db.VarChar(100)
+  BookingDate   DateTime      @default(now())
+  MoveInDate    DateTime
+  Status        BookingStatus @default(PENDING)
+  Deposit       Int?
+  Note          String?       @db.Text
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+// Enums
 enum user_role {
   ADMIN
   USER
+  EMPLOYEE
+}
+
+enum RoomStatus {
+  AVAILABLE      // ว่าง
+  OCCUPIED       // มีผู้เช่า
+  MAINTENANCE    // ซ่อมบำรุง
+  RESERVED       // จองแล้ว
+}
+
+enum PaymentStatus {
+  PAID           // จ่ายแล้ว
+  UNPAID         // ยังไม่จ่าย
+  PARTIAL        // จ่ายบางส่วน
+  OVERDUE        // เกินกำหนด
+}
+
+enum RepairStatus {
+  PENDING        // รอดำเนินการ
+  IN_PROGRESS    // กำลังซ่อม
+  COMPLETED      // เสร็จสิ้น
+  CANCELLED      // ยกเลิก
+}
+
+enum BookingStatus {
+  PENDING        // รอยืนยัน
+  CONFIRMED      // ยืนยันแล้ว
+  CANCELLED      // ยกเลิก
+  COMPLETED      // เข้าพักแล้ว
 }
