@@ -1,15 +1,23 @@
 # 🏠 Dormitory Management System API
 
-ระบบจัดการหอพัก (Backend API) - ระบบสำหรับจัดการข้อมูลหอพักแบบครบวงจร รองรับการจัดการห้องพัก ลูกค้า การชำระเงิน การแจ้งซ่อม และพนักงาน
+> **ระบบจัดการหอพัก Backend API** - ระบบสำหรับจัดการข้อมูลหอพักแบบครบวงจร พัฒนาด้วย Node.js, Express, Prisma ORM และ MySQL รองรับการจัดการห้องพัก ลูกค้า การชำระเงิน การแจ้งซ่อม และพนักงาน
+
+---
 
 ## 📋 สารบัญ
-- [ความต้องการของระบบ](#ความต้องการของระบบ)
-- [การติดตั้ง](#การติดตั้ง)
-- [การตั้งค่า](#การตั้งค่า)
-- [การรันโปรเจกต์](#การรันโปรเจกต์)
-- [API Endpoints](#api-endpoints)
-- [โครงสร้างฐานข้อมูล](#โครงสร้างฐานข้อมูล)
-- [การใช้งาน](#การใช้งาน)
+
+1. [ความต้องการของระบบ](#️-ความต้องการของระบบ)
+2. [การติดตั้ง](#-การติดตั้ง)
+3. [การรันโปรเจกต์](#-การรันโปรเจกต์)
+4. [โครงสร้างโปรเจกต์](#-โครงสร้างโปรเจกต์)
+5. [การทำงานของระบบ](#-การทำงานของระบบ-request-flow)
+6. [API Endpoints](#-api-endpoints)
+7. [โครงสร้างฐานข้อมูล](#️-โครงสร้างฐานข้อมูล)
+8. [ตัวอย่างการใช้งาน](#-ตัวอย่างการใช้งาน)
+9. [เครื่องมือทดสอบ API](#️-เครื่องมือสำหรับทดสอบ-api)
+10. [Security](#-security)
+11. [การแก้ไขปัญหา](#-การแก้ไขปัญหา)
+12. [สิ่งที่ควรพัฒนาต่อ](#-สิ่งที่ควรพัฒนาต่อ)
 
 ---
 
@@ -17,69 +25,80 @@
 
 ก่อนเริ่มติดตั้ง ต้องมีโปรแกรมเหล่านี้ติดตั้งอยู่ในเครื่อง:
 
-- **Node.js** (เวอร์ชัน 16 ขึ้นไป) - [ดาวน์โหลด](https://nodejs.org/)
-- **Docker & Docker Compose** - [ดาวน์โหลด](https://www.docker.com/products/docker-desktop/)
-- **Git** - [ดาวน์โหลด](https://git-scm.com/)
+| โปรแกรม | เวอร์ชันแนะนำ | ลิงก์ดาวน์โหลด |
+|---------|--------------|----------------|
+| **Node.js** | 16.x ขึ้นไป | [nodejs.org](https://nodejs.org/) |
+| **Docker Desktop** | Latest | [docker.com](https://www.docker.com/products/docker-desktop/) |
+| **Git** | Latest | [git-scm.com](https://git-scm.com/) |
 
 ---
 
 ## 📦 การติดตั้ง
 
-### 1. Clone โปรเจกต์
+### ขั้นตอนที่ 1: Clone โปรเจกต์
+
 ```bash
 git clone <repository-url>
 cd react-server
 ```
 
-### 2. ติดตั้ง Dependencies
+### ขั้นตอนที่ 2: ติดตั้ง Dependencies
+
 ```bash
 npm install
 ```
 
-### 3. ตั้งค่า Environment Variables
+### ขั้นตอนที่ 3: ตั้งค่า Environment Variables
+
 สร้างไฟล์ `.env` ในโฟลเดอร์ root ของโปรเจกต์:
 
 ```env
 DATABASE_URL="mysql://root:root123@localhost:3306/dormitory"
 ```
 
-**หมายเหตุ:** หากต้องการเปลี่ยนรหัสผ่านฐานข้อมูล ให้แก้ไขทั้งในไฟล์ `.env` และ `docker-compose.yml`
+> **💡 หมายเหตุ:** หากต้องการเปลี่ยนรหัสผ่านฐานข้อมูล ให้แก้ไขทั้งในไฟล์ `.env` และ `docker-compose.yml`
 
-### 4. เปิดฐานข้อมูล MySQL ด้วย Docker
+### ขั้นตอนที่ 4: เปิดฐานข้อมูล MySQL ด้วย Docker
+
 ```bash
 docker-compose up -d
 ```
 
 คำสั่งนี้จะ:
-- สร้าง Container MySQL 8.0
-- ตั้งค่าฐานข้อมูลชื่อ `dormitory`
-- เปิด Port 3306
+- ✅ สร้าง Container MySQL 8.0
+- ✅ ตั้งค่าฐานข้อมูลชื่อ `dormitory`
+- ✅ เปิด Port 3306
+- ✅ ตั้งค่า User: `root` / Password: `root123`
 
-### 5. สร้างตารางในฐานข้อมูลด้วย Prisma
+### ขั้นตอนที่ 5: สร้างตารางในฐานข้อมูลด้วย Prisma
+
 ```bash
 npx prisma generate
 npx prisma db push
 ```
 
 คำสั่งนี้จะ:
-- `generate`: สร้าง Prisma Client สำหรับเชื่อมต่อฐานข้อมูล
-- `db push`: สร้างตารางในฐานข้อมูลตาม schema ที่กำหนด
+- `prisma generate` - สร้าง Prisma Client สำหรับเชื่อมต่อฐานข้อมูล
+- `prisma db push` - สร้างตารางทั้งหมด (16 ตาราง) ในฐานข้อมูลตาม schema
 
 ---
 
 ## 🚀 การรันโปรเจกต์
 
-### Development Mode (Auto-reload)
+### เริ่มต้น Development Server
+
 ```bash
 npm start
 ```
 
-Server จะทำงานที่ `http://localhost:3001`
+Server จะทำงานที่ `http://localhost:3001` พร้อม Auto-reload (nodemon)
 
 ### ตรวจสอบว่า Server ทำงาน
-เปิด Browser แล้วไปที่:
-```
-http://localhost:3001
+
+เปิด Browser หรือใช้ cURL:
+
+```bash
+curl http://localhost:3001
 ```
 
 ควรได้ Response:
@@ -91,76 +110,303 @@ http://localhost:3001
 
 ---
 
+## 📂 โครงสร้างโปรเจกต์
+
+```
+react-server/
+│
+├── 📁 controllers/            # Business Logic Layer
+│   ├── auth.js               # 🔐 การสมัครสมาชิก, เข้าสู่ระบบ, JWT
+│   ├── customer.js           # 👤 CRUD ลูกค้า, Check-in/Check-out
+│   ├── employee.js           # 👷 CRUD พนักงาน
+│   ├── payment.js            # 💰 จัดการบิล, การชำระเงิน
+│   ├── repair.js             # 🔧 จัดการแจ้งซ่อม
+│   ├── room.js               # 🏠 CRUD ห้องพัก, อัพเดทสถานะ
+│   └── user.js               # 👥 จัดการผู้ใช้งานระบบ
+│
+├── 📁 middleware/             # Security & Validation Layer
+│   ├── auth.js               # 🔑 ตรวจสอบ JWT Token
+│   └── user.js               # ✅ ตรวจสอบสิทธิ์ผู้ใช้ (Authorization)
+│
+├── 📁 routers/                # API Routes Layer
+│   ├── auth.js               # POST /api/register, /api/login
+│   ├── customer.js           # GET, POST, PATCH, DELETE /api/customers
+│   ├── employee.js           # GET, POST, PATCH, DELETE /api/employees
+│   ├── payment.js            # GET, POST, PATCH, DELETE /api/payments
+│   ├── repair.js             # GET, POST, PATCH, DELETE /api/repairs
+│   ├── room.js               # GET, POST, PATCH, DELETE /api/rooms
+│   └── user.js               # GET, PATCH, DELETE /api/users
+│
+├── 📁 prisma/                 # Database Schema & ORM
+│   ├── schema.prisma         # 📋 โครงสร้างฐานข้อมูล 16 ตาราง
+│   └── migrations/           # 📂 ประวัติการเปลี่ยนแปลง Schema
+│
+├── 📁 node_modules/           # Dependencies
+│
+├── 📄 .env                    # 🔐 Environment Variables (ห้ามเอาขึ้น Git!)
+├── 📄 .gitignore              # 🚫 ไฟล์ที่ไม่ต้องการเข้า Git
+├── 📄 docker-compose.yml      # 🐳 Docker Configuration (MySQL)
+├── 📄 package.json            # 📋 ข้อมูลโปรเจกต์และ Dependencies
+├── 📄 package-lock.json       # 🔒 Lock versions
+├── 📄 server.js               # ⚙️ Main Entry Point
+└── 📄 README.md               # 📖 เอกสารนี้
+```
+
+### 📝 คำอธิบายไฟล์สำคัญ
+
+#### **controllers/** - Business Logic Layer
+ประมวลผลข้อมูลและจัดการ Database
+
+- **auth.js** - จัดการการสมัครสมาชิก (Register) และเข้าสู่ระบบ (Login)
+  - ตรวจสอบข้อมูล email/password
+  - เข้ารหัสรหัสผ่านด้วย bcrypt
+  - สร้าง JWT Token สำหรับ Authentication
+
+- **customer.js** - จัดการข้อมูลลูกค้า/ผู้เช่า
+  - CRUD ลูกค้า (สร้าง, อ่าน, แก้ไข, ลบ)
+  - Check-in ลูกค้าเข้าพัก
+  - Check-out ลูกค้าออกจากหอพัก
+  - ดูลูกค้าที่อยู่ในหอ (status: active)
+
+- **employee.js** - จัดการข้อมูลพนักงาน
+  - CRUD พนักงาน (แม่บ้าน, รปภ., ช่างซ่อม)
+  - ดูพนักงานที่ทำงานอยู่
+  - อัพเดทสถานะพนักงาน (active/inactive/resigned)
+
+- **payment.js** - จัดการบิลค่าเช่าและการชำระเงิน
+  - สร้างบิลรายเดือน (ค่าเช่า, ค่าน้ำ, ค่าไฟ)
+  - คำนวณค่าใช้จ่ายทั้งหมด
+  - บันทึกการชำระเงิน (Paid/Unpaid/Partial)
+  - ดูบิลที่ค้างชำระ (Overdue)
+
+- **repair.js** - จัดการรายการแจ้งซ่อม
+  - รับแจ้งซ่อมจากลูกค้า
+  - อัพเดทสถานะการซ่อม (Pending/In Progress/Completed)
+  - บันทึกค่าใช้จ่ายในการซ่อม
+  - ดูรายการซ่อมตามห้อง/สถานะ
+
+- **room.js** - จัดการข้อมูลห้องพัก
+  - CRUD ห้องพัก
+  - อัพเดทสถานะห้อง (Available/Occupied/Maintenance)
+  - ดูห้องว่าง (Available rooms)
+  - จัดการข้อมูลราคาและสิ่งอำนวยความสะดวก
+
+- **user.js** - จัดการผู้ใช้งานระบบ
+  - ดูรายชื่อ users ทั้งหมด
+  - แก้ไขข้อมูล user (email, role)
+  - ลบ user
+  - เปลี่ยนสิทธิ์ (ADMIN/USER/EMPLOYEE)
+
+#### **middleware/** - Security Layer
+ตรวจสอบก่อนเข้าถึง Controller
+
+- **auth.js** - ตรวจสอบ JWT Token
+  - ดึง Token จาก Header (Authorization: Bearer <token>)
+  - Verify Token ว่าถูกต้องและยังไม่หมดอายุ
+  - แนบข้อมูล user ไปยัง req.user
+  - ป้องกัน Endpoint ที่ต้อง Authentication
+
+- **user.js** - ตรวจสอบสิทธิ์ผู้ใช้ (Authorization)
+  - ตรวจสอบ Role (isAdmin, isEmployee)
+  - Validate ข้อมูลที่ส่งมา (Input Validation)
+  - ป้องกันการเข้าถึงข้อมูลที่ไม่มีสิทธิ์
+
+#### **routers/** - API Routes Layer
+กำหนด Endpoint และเชื่อม Controller
+
+แต่ละไฟล์จะกำหนด Routes ดังนี้:
+
+- **auth.js**: `POST /api/register`, `POST /api/login`
+- **customer.js**: CRUD endpoints สำหรับ `/api/customers`
+- **employee.js**: CRUD endpoints สำหรับ `/api/employees`
+- **payment.js**: CRUD endpoints สำหรับ `/api/payments`
+- **repair.js**: CRUD endpoints สำหรับ `/api/repairs`
+- **room.js**: CRUD endpoints สำหรับ `/api/rooms`
+- **user.js**: CRUD endpoints สำหรับ `/api/users`
+
+#### **prisma/schema.prisma**
+ไฟล์กำหนดโครงสร้างฐานข้อมูล
+- กำหนด Models ทั้งหมด (16 ตาราง)
+- กำหนด Relations ระหว่างตาราง
+- กำหนด Enums (RoomStatus, PaymentStatus, RepairStatus, etc.)
+- ตั้งค่า Database connection (MySQL)
+
+#### **server.js** - Main Entry Point
+ไฟล์หลักของ Server
+- สร้าง Express app
+- ตั้งค่า Middleware (morgan, body-parser, cors)
+- โหลด Routers ทั้งหมดจากโฟลเดอร์ routers/
+- Listen ที่ Port 3001
+- แสดงรายการ API Endpoints ทั้งหมดเมื่อเริ่มต้น
+
+#### **package.json** - Dependencies
+- `express` - Web Framework
+- `@prisma/client` - Prisma ORM Client
+- `bcrypt` - เข้ารหัสรหัสผ่าน
+- `jsonwebtoken` - สร้าง/ตรวจสอบ JWT
+- `cors` - อนุญาต Cross-Origin Requests
+- `morgan` - HTTP Request Logger
+- `nodemon` - Auto-restart server (dev)
+
+#### **docker-compose.yml**
+ตั้งค่า Docker Container สำหรับ MySQL
+- Image: mysql:8.0
+- Database: dormitory
+- Port: 3306
+- Credentials: root/root123
+
+---
+
+## 🔄 การทำงานของระบบ (Request Flow)
+
+เมื่อ Client ส่ง Request มายัง API จะมีการทำงานผ่านขั้นตอนดังนี้:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1. Client ส่ง HTTP Request                                │
+│     (GET, POST, PATCH, DELETE)                              │
+└────────────────────┬────────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────────┐
+│  2. server.js รับ Request                                   │
+│     Express Application (Port 3001)                         │
+└────────────────────┬────────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────────┐
+│  3. Middleware ประมวลผล                                     │
+│     ├─ morgan: บันทึก HTTP log                             │
+│     ├─ body-parser: แปลง Request Body เป็น JSON           │
+│     ├─ cors: ตรวจสอบ Cross-Origin                          │
+│     └─ middleware/auth.js: ตรวจสอบ JWT Token (ถ้าต้องการ)  │
+└────────────────────┬────────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────────┐
+│  4. Router เลือก Endpoint ที่ตรงกับ URL                    │
+│     เช่น /api/customers → routers/customer.js              │
+└────────────────────┬────────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────────┐
+│  5. Controller ประมวลผล Business Logic                     │
+│     ├─ ตรวจสอบข้อมูล (Validation)                          │
+│     ├─ เชื่อมต่อ Database ผ่าน Prisma Client               │
+│     ├─ ดึงข้อมูล / สร้าง / แก้ไข / ลบ (CRUD)              │
+│     └─ จัดรูปแบบ Response                                   │
+└────────────────────┬────────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────────┐
+│  6. Client ได้รับ Response (JSON)                          │
+│     { success: true, data: {...} }                          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 🎯 ตัวอย่างการทำงานจริง: สร้างลูกค้าใหม่
+
+```
+POST /api/customers
+Body: { Customer_ID: "C001", Customer_Name: "สมชาย", ... }
+│
+├─→ server.js รับ Request
+│
+├─→ routers/customer.js เลือก Route ที่ตรงกับ POST /api/customers
+│
+├─→ controllers/customer.js (create function)
+│   │
+│   ├─ 1. Validate ข้อมูลที่ส่งมา (ครบหรือไม่, รูปแบบถูกต้องหรือไม่)
+│   │
+│   ├─ 2. เช็คว่าห้องที่ระบุว่างหรือไม่
+│   │    prisma.room.findUnique({ where: { Room_Number: "101" } })
+│   │
+│   ├─ 3. สร้างลูกค้าใหม่ในฐานข้อมูล
+│   │    prisma.customer.create({ data: {...} })
+│   │
+│   ├─ 4. อัพเดทสถานะห้องเป็น OCCUPIED
+│   │    prisma.room.update({ Room_Status: "OCCUPIED" })
+│   │
+│   └─ 5. ส่ง Response กลับ
+│       { success: true, customer: { id: "C001", ... } }
+│
+└─→ Client ได้รับผลลัพธ์
+```
+
+---
+
 ## 📡 API Endpoints
 
 ### 🔐 Authentication
-| Method | Endpoint | คำอธิบาย |
-|--------|----------|----------|
-| POST | `/api/register` | สมัครสมาชิกใหม่ |
-| POST | `/api/login` | เข้าสู่ระบบ |
-| GET | `/api/auth/users` | ดูข้อมูล users ทั้งหมด (ต้อง Auth) |
+
+| Method | Endpoint | คำอธิบาย | Auth Required |
+|--------|----------|----------|---------------|
+| POST | `/api/register` | สมัครสมาชิกใหม่ | ❌ |
+| POST | `/api/login` | เข้าสู่ระบบ (ได้ JWT Token) | ❌ |
+| GET | `/api/auth/users` | ดูข้อมูล users ทั้งหมด | ✅ |
 
 ### 👥 Users
-| Method | Endpoint | คำอธิบาย |
-|--------|----------|----------|
-| GET | `/api/users` | ดูรายชื่อ users ทั้งหมด |
-| PATCH | `/api/users/:userId` | แก้ไขข้อมูล user |
-| DELETE | `/api/users/:userId` | ลบ user |
+
+| Method | Endpoint | คำอธิบาย | Auth Required |
+|--------|----------|----------|---------------|
+| GET | `/api/users` | ดูรายชื่อ users ทั้งหมด | ❌ |
+| PATCH | `/api/users/:userId` | แก้ไขข้อมูล user | ✅ |
+| DELETE | `/api/users/:userId` | ลบ user | ✅ |
 
 ### 🏠 Rooms (ห้องพัก)
-| Method | Endpoint | คำอธิบาย |
-|--------|----------|----------|
-| GET | `/api/rooms` | ดูห้องทั้งหมด |
-| GET | `/api/rooms/available` | ดูห้องว่าง |
-| GET | `/api/rooms/:roomNumber` | ดูข้อมูลห้องเดียว |
-| POST | `/api/rooms` | สร้างห้องใหม่ |
-| PATCH | `/api/rooms/:roomNumber` | แก้ไขข้อมูลห้อง |
-| DELETE | `/api/rooms/:roomNumber` | ลบห้อง |
+
+| Method | Endpoint | คำอธิบาย | Auth Required |
+|--------|----------|----------|---------------|
+| GET | `/api/rooms` | ดูห้องทั้งหมด | ❌ |
+| GET | `/api/rooms/available` | ดูห้องว่าง (AVAILABLE) | ❌ |
+| GET | `/api/rooms/:roomNumber` | ดูข้อมูลห้องเดียว | ❌ |
+| POST | `/api/rooms` | สร้างห้องใหม่ | ✅ |
+| PATCH | `/api/rooms/:roomNumber` | แก้ไขข้อมูลห้อง | ✅ |
+| DELETE | `/api/rooms/:roomNumber` | ลบห้อง | ✅ |
 
 ### 👤 Customers (ลูกค้า/ผู้เช่า)
-| Method | Endpoint | คำอธิบาย |
-|--------|----------|----------|
-| GET | `/api/customers` | ดูลูกค้าทั้งหมด |
-| GET | `/api/customers/active` | ดูลูกค้าที่อยู่ในหอพัก |
-| GET | `/api/customers/:customerId` | ดูข้อมูลลูกค้าคนเดียว |
-| POST | `/api/customers` | สร้างลูกค้าใหม่ (Check-in) |
-| PATCH | `/api/customers/:customerId` | แก้ไขข้อมูลลูกค้า |
-| PATCH | `/api/customers/:customerId/checkout` | Check-out ลูกค้า |
-| DELETE | `/api/customers/:customerId` | ลบลูกค้า |
+
+| Method | Endpoint | คำอธิบาย | Auth Required |
+|--------|----------|----------|---------------|
+| GET | `/api/customers` | ดูลูกค้าทั้งหมด | ❌ |
+| GET | `/api/customers/active` | ดูลูกค้าที่อยู่ในหอพัก (active) | ❌ |
+| GET | `/api/customers/:customerId` | ดูข้อมูลลูกค้าคนเดียว | ❌ |
+| POST | `/api/customers` | สร้างลูกค้าใหม่ (Check-in) | ✅ |
+| PATCH | `/api/customers/:customerId` | แก้ไขข้อมูลลูกค้า | ✅ |
+| PATCH | `/api/customers/:customerId/checkout` | Check-out ลูกค้า | ✅ |
+| DELETE | `/api/customers/:customerId` | ลบลูกค้า | ✅ |
 
 ### 💰 Payments (การชำระเงิน)
-| Method | Endpoint | คำอธิบาย |
-|--------|----------|----------|
-| GET | `/api/payments` | ดูบิลทั้งหมด |
-| GET | `/api/payments/unpaid` | ดูบิลที่ยังไม่จ่าย |
-| GET | `/api/payments/room/:roomNumber` | ดูบิลตามห้อง |
-| GET | `/api/payments/:payId` | ดูบิลเดียว |
-| POST | `/api/payments` | สร้างบิลใหม่ |
-| PATCH | `/api/payments/:payId` | แก้ไขบิล |
-| PATCH | `/api/payments/:payId/pay` | ชำระเงิน |
-| DELETE | `/api/payments/:payId` | ลบบิล |
+
+| Method | Endpoint | คำอธิบาย | Auth Required |
+|--------|----------|----------|---------------|
+| GET | `/api/payments` | ดูบิลทั้งหมด | ❌ |
+| GET | `/api/payments/unpaid` | ดูบิลที่ยังไม่จ่าย (UNPAID/OVERDUE) | ❌ |
+| GET | `/api/payments/room/:roomNumber` | ดูบิลตามเลขห้อง | ❌ |
+| GET | `/api/payments/:payId` | ดูบิลเดียว | ❌ |
+| POST | `/api/payments` | สร้างบิลใหม่ | ✅ |
+| PATCH | `/api/payments/:payId` | แก้ไขบิล | ✅ |
+| PATCH | `/api/payments/:payId/pay` | ชำระเงิน (อัพเดทสถานะ PAID) | ✅ |
+| DELETE | `/api/payments/:payId` | ลบบิล | ✅ |
 
 ### 🔧 Repairs (แจ้งซ่อม)
-| Method | Endpoint | คำอธิบาย |
-|--------|----------|----------|
-| GET | `/api/repairs` | ดูรายการแจ้งซ่อมทั้งหมด |
-| GET | `/api/repairs/pending` | ดูรายการแจ้งซ่อมที่รอดำเนินการ |
-| GET | `/api/repairs/room/:roomNumber` | ดูรายการแจ้งซ่อมตามห้อง |
-| GET | `/api/repairs/:repairId` | ดูรายการแจ้งซ่อมเดียว |
-| POST | `/api/repairs` | สร้างรายการแจ้งซ่อมใหม่ |
-| PATCH | `/api/repairs/:repairId` | แก้ไขรายการแจ้งซ่อม |
-| PATCH | `/api/repairs/:repairId/status` | อัพเดทสถานะการซ่อม |
-| DELETE | `/api/repairs/:repairId` | ลบรายการแจ้งซ่อม |
+
+| Method | Endpoint | คำอธิบาย | Auth Required |
+|--------|----------|----------|---------------|
+| GET | `/api/repairs` | ดูรายการแจ้งซ่อมทั้งหมด | ❌ |
+| GET | `/api/repairs/pending` | ดูรายการแจ้งซ่อมที่รอดำเนินการ (PENDING) | ❌ |
+| GET | `/api/repairs/room/:roomNumber` | ดูรายการแจ้งซ่อมตามห้อง | ❌ |
+| GET | `/api/repairs/:repairId` | ดูรายการแจ้งซ่อมเดียว | ❌ |
+| POST | `/api/repairs` | สร้างรายการแจ้งซ่อมใหม่ | ✅ |
+| PATCH | `/api/repairs/:repairId` | แก้ไขรายการแจ้งซ่อม | ✅ |
+| PATCH | `/api/repairs/:repairId/status` | อัพเดทสถานะการซ่อม | ✅ |
+| DELETE | `/api/repairs/:repairId` | ลบรายการแจ้งซ่อม | ✅ |
 
 ### 👷 Employees (พนักงาน)
-| Method | Endpoint | คำอธิบาย |
-|--------|----------|----------|
-| GET | `/api/employees` | ดูพนักงานทั้งหมด |
-| GET | `/api/employees/active` | ดูพนักงานที่ทำงานอยู่ |
-| GET | `/api/employees/:empId` | ดูข้อมูลพนักงานคนเดียว |
-| POST | `/api/employees` | สร้างพนักงานใหม่ |
-| PATCH | `/api/employees/:empId` | แก้ไขข้อมูลพนักงาน |
-| DELETE | `/api/employees/:empId` | ลบพนักงาน |
+
+| Method | Endpoint | คำอธิบาย | Auth Required |
+|--------|----------|----------|---------------|
+| GET | `/api/employees` | ดูพนักงานทั้งหมด | ❌ |
+| GET | `/api/employees/active` | ดูพนักงานที่ทำงานอยู่ (active) | ❌ |
+| GET | `/api/employees/:empId` | ดูข้อมูลพนักงานคนเดียว | ❌ |
+| POST | `/api/employees` | สร้างพนักงานใหม่ | ✅ |
+| PATCH | `/api/employees/:empId` | แก้ไขข้อมูลพนักงาน | ✅ |
+| DELETE | `/api/employees/:empId` | ลบพนักงาน | ✅ |
 
 ---
 
@@ -172,7 +418,9 @@ http://localhost:3001
 
 ### 🔐 ตารางระบบและผู้ใช้งาน
 
-#### 1. **user** - ผู้ใช้ระบบ
+<details>
+<summary><b>1. user</b> - ผู้ใช้ระบบ (คลิกเพื่อดูรายละเอียด)</summary>
+
 ตารางสำหรับจัดการผู้ใช้งานระบบและการเข้าสู่ระบบ
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -184,7 +432,11 @@ http://localhost:3001
 | `createdAt` | DateTime | วันที่สร้างบัญชี |
 | `updatedAt` | DateTime | วันที่แก้ไขล่าสุด |
 
-#### 2. **Admin** - ผู้ดูแลระบบ
+</details>
+
+<details>
+<summary><b>2. Admin</b> - ผู้ดูแลระบบ (คลิกเพื่อดูรายละเอียด)</summary>
+
 ข้อมูลแอดมินที่ดูแลหอพัก
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -198,11 +450,15 @@ http://localhost:3001
 | `createdAt` | DateTime | วันที่สร้างข้อมูล |
 | `updatedAt` | DateTime | วันที่แก้ไขล่าสุด |
 
+</details>
+
 ---
 
 ### 🏠 ตารางห้องพักและลูกค้า
 
-#### 3. **Room** - ห้องพัก
+<details>
+<summary><b>3. Room</b> - ห้องพัก (คลิกเพื่อดูรายละเอียด)</summary>
+
 ข้อมูลห้องพักทั้งหมดในหอพัก
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -222,7 +478,11 @@ http://localhost:3001
 - เชื่อมกับ `Customer` (1 ห้องมีได้หลายลูกค้าตามช่วงเวลา)
 - เชื่อมกับ `Maintenance` (ประวัติการซ่อมบำรุง)
 
-#### 4. **Customer** - ลูกค้า/ผู้เช่า
+</details>
+
+<details>
+<summary><b>4. Customer</b> - ลูกค้า/ผู้เช่า (คลิกเพื่อดูรายละเอียด)</summary>
+
 ข้อมูลผู้เช่าที่อาศัยอยู่ในหอพัก
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -246,11 +506,15 @@ http://localhost:3001
 - เชื่อมกับ `Payment` (บิลค่าเช่าทั้งหมด)
 - เชื่อมกับ `Repair` (รายการแจ้งซ่อม)
 
+</details>
+
 ---
 
 ### 💰 ตารางการเงินและค่าใช้จ่าย
 
-#### 5. **Payment** - บิลค่าใช้จ่าย/ใบแจ้งหนี้
+<details>
+<summary><b>5. Payment</b> - บิลค่าใช้จ่าย/ใบแจ้งหนี้ (คลิกเพื่อดูรายละเอียด)</summary>
+
 บิลรายเดือนสำหรับแต่ละห้อง
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -279,7 +543,11 @@ http://localhost:3001
 **Relations:**
 - เชื่อมกับ `Customer` ผ่าน Customer_Room
 
-#### 6. **FixedRate** - อัตราค่าใช้จ่ายคงที่
+</details>
+
+<details>
+<summary><b>6. FixedRate</b> - อัตราค่าใช้จ่ายคงที่ (คลิกเพื่อดูรายละเอียด)</summary>
+
 ตารางเก็บอัตราค่าใช้จ่ายมาตรฐานที่ใช้คำนวณบิล
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -297,7 +565,11 @@ http://localhost:3001
 | `createdAt` | DateTime | วันที่สร้างข้อมูล |
 | `updatedAt` | DateTime | วันที่แก้ไขล่าสุด |
 
-#### 7. **MeterReading** - บันทึกมิเตอร์น้ำ-ไฟ
+</details>
+
+<details>
+<summary><b>7. MeterReading</b> - บันทึกมิเตอร์น้ำ-ไฟ (คลิกเพื่อดูรายละเอียด)</summary>
+
 บันทึกเลขมิเตอร์รายเดือนของแต่ละห้อง
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -316,7 +588,11 @@ http://localhost:3001
 | `createdAt` | DateTime | วันที่สร้างข้อมูล |
 | `updatedAt` | DateTime | วันที่แก้ไขล่าสุด |
 
-#### 8. **Expense** - รายจ่ายของหอพัก
+</details>
+
+<details>
+<summary><b>8. Expense</b> - รายจ่ายของหอพัก (คลิกเพื่อดูรายละเอียด)</summary>
+
 บันทึกค่าใช้จ่ายในการบริหารหอพัก
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -331,11 +607,15 @@ http://localhost:3001
 | `createdAt` | DateTime | วันที่สร้างข้อมูล |
 | `updatedAt` | DateTime | วันที่แก้ไขล่าสุด |
 
+</details>
+
 ---
 
 ### 🔧 ตารางการซ่อมและบำรุงรักษา
 
-#### 9. **Repair** - รายการแจ้งซ่อม
+<details>
+<summary><b>9. Repair</b> - รายการแจ้งซ่อม (คลิกเพื่อดูรายละเอียด)</summary>
+
 ระบบแจ้งซ่อมจากผู้เช่า
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -357,7 +637,11 @@ http://localhost:3001
 **Relations:**
 - เชื่อมกับ `Customer` (ผู้แจ้งซ่อม)
 
-#### 10. **Maintenance** - การซ่อมบำรุง
+</details>
+
+<details>
+<summary><b>10. Maintenance</b> - การซ่อมบำรุง (คลิกเพื่อดูรายละเอียด)</summary>
+
 บันทึกการซ่อมบำรุงห้อง/อาคาร
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -377,11 +661,15 @@ http://localhost:3001
 - เชื่อมกับ `Room` (ห้องที่ซ่อม)
 - เชื่อมกับ `Employee` (ช่างผู้ซ่อม)
 
+</details>
+
 ---
 
 ### 👷 ตารางพนักงาน
 
-#### 11. **Employee** - พนักงาน
+<details>
+<summary><b>11. Employee</b> - พนักงาน (คลิกเพื่อดูรายละเอียด)</summary>
+
 ข้อมูลพนักงานที่ดูแลหอพัก
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -401,11 +689,15 @@ http://localhost:3001
 **Relations:**
 - เชื่อมกับ `Maintenance` (งานซ่อมบำรุงที่รับผิดชอบ)
 
+</details>
+
 ---
 
 ### 📋 ตารางสัญญาและจอง
 
-#### 12. **Contract** - สัญญาเช่า
+<details>
+<summary><b>12. Contract</b> - สัญญาเช่า (คลิกเพื่อดูรายละเอียด)</summary>
+
 เอกสารสัญญาเช่าระหว่างหอพักกับผู้เช่า
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -423,7 +715,11 @@ http://localhost:3001
 | `createdAt` | DateTime | วันที่สร้างสัญญา |
 | `updatedAt` | DateTime | วันที่แก้ไขล่าสุด |
 
-#### 13. **Booking** - การจองห้องพัก
+</details>
+
+<details>
+<summary><b>13. Booking</b> - การจองห้องพัก (คลิกเพื่อดูรายละเอียด)</summary>
+
 ระบบจองห้องล่วงหน้าก่อนเข้าพัก
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -441,11 +737,15 @@ http://localhost:3001
 | `createdAt` | DateTime | วันที่สร้างข้อมูล |
 | `updatedAt` | DateTime | วันที่แก้ไขล่าสุด |
 
+</details>
+
 ---
 
 ### 📢 ตารางประกาศและบันทึก
 
-#### 14. **Announcement** - ประกาศ/ข่าวสาร
+<details>
+<summary><b>14. Announcement</b> - ประกาศ/ข่าวสาร (คลิกเพื่อดูรายละเอียด)</summary>
+
 ระบบประกาศข่าวสารสำหรับผู้เช่า
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -462,7 +762,11 @@ http://localhost:3001
 | `createdAt` | DateTime | วันที่สร้างข้อมูล |
 | `updatedAt` | DateTime | วันที่แก้ไขล่าสุด |
 
-#### 15. **VisitorLog** - บันทึกผู้เข้า-ออก
+</details>
+
+<details>
+<summary><b>15. VisitorLog</b> - บันทึกผู้เข้า-ออก (คลิกเพื่อดูรายละเอียด)</summary>
+
 ระบบบันทึกผู้มาเยี่ยม (Visitor Management)
 
 | ฟิลด์ | ประเภท | คำอธิบาย |
@@ -477,47 +781,49 @@ http://localhost:3001
 | `Note` | Text | หมายเหตุ (nullable) |
 | `createdAt` | DateTime | วันที่สร้างข้อมูล |
 
+</details>
+
 ---
 
 ### 📊 Enums (ค่าคงที่)
 
-#### user_role
+#### **user_role** - บทบาทผู้ใช้
 ```
-ADMIN     - ผู้ดูแลระบบ (เข้าถึงได้ทุกอย่าง)
-USER      - ผู้ใช้ทั่วไป (ลูกค้า)
-EMPLOYEE  - พนักงาน (สิทธิ์จำกัด)
-```
-
-#### RoomStatus
-```
-AVAILABLE    - ห้องว่าง (พร้อมให้เช่า)
-OCCUPIED     - มีผู้เช่าอยู่
-MAINTENANCE  - อยู่ระหว่างซ่อมบำรุง
-RESERVED     - จองแล้ว (รอเข้าพัก)
+ADMIN     → ผู้ดูแลระบบ (เข้าถึงได้ทุกอย่าง)
+USER      → ผู้ใช้ทั่วไป (ลูกค้า)
+EMPLOYEE  → พนักงาน (สิทธิ์จำกัด)
 ```
 
-#### PaymentStatus
+#### **RoomStatus** - สถานะห้องพัก
 ```
-PAID      - จ่ายครบแล้ว
-UNPAID    - ยังไม่ได้จ่าย
-PARTIAL   - จ่ายบางส่วน (ค้างอยู่)
-OVERDUE   - เกินกำหนดชำระ
-```
-
-#### RepairStatus
-```
-PENDING      - รอดำเนินการ
-IN_PROGRESS  - กำลังซ่อม
-COMPLETED    - เสร็จสิ้น
-CANCELLED    - ยกเลิก
+AVAILABLE    → ห้องว่าง (พร้อมให้เช่า)
+OCCUPIED     → มีผู้เช่าอยู่
+MAINTENANCE  → อยู่ระหว่างซ่อมบำรุง
+RESERVED     → จองแล้ว (รอเข้าพัก)
 ```
 
-#### BookingStatus
+#### **PaymentStatus** - สถานะการชำระเงิน
 ```
-PENDING    - รอยืนยัน
-CONFIRMED  - ยืนยันแล้ว
-CANCELLED  - ยกเลิก
-COMPLETED  - เข้าพักแล้ว (เปลี่ยนเป็น Customer)
+PAID      → จ่ายครบแล้ว
+UNPAID    → ยังไม่ได้จ่าย
+PARTIAL   → จ่ายบางส่วน (ค้างอยู่)
+OVERDUE   → เกินกำหนดชำระ
+```
+
+#### **RepairStatus** - สถานะการซ่อม
+```
+PENDING      → รอดำเนินการ
+IN_PROGRESS  → กำลังซ่อม
+COMPLETED    → เสร็จสิ้น
+CANCELLED    → ยกเลิก
+```
+
+#### **BookingStatus** - สถานะการจอง
+```
+PENDING    → รอยืนยัน
+CONFIRMED  → ยืนยันแล้ว
+CANCELLED  → ยกเลิก
+COMPLETED  → เข้าพักแล้ว (เปลี่ยนเป็น Customer)
 ```
 
 ---
@@ -525,22 +831,29 @@ COMPLETED  - เข้าพักแล้ว (เปลี่ยนเป็�
 ### 🔗 ความสัมพันธ์ระหว่างตาราง (Entity Relationships)
 
 ```
-Room (1) ──→ (N) Customer          : 1 ห้องมีได้หลายลูกค้า (ตามช่วงเวลา)
-Room (1) ──→ (N) Maintenance       : 1 ห้องมีประวัติการซ่อมหลายครั้ง
+Room (1) ──→ (N) Customer
+  └─ 1 ห้องมีได้หลายลูกค้า (ตามช่วงเวลา)
 
-Customer (1) ──→ (N) Payment       : 1 ลูกค้ามีหลายบิล
-Customer (1) ──→ (N) Repair        : 1 ลูกค้าแจ้งซ่อมได้หลายครั้ง
+Room (1) ──→ (N) Maintenance
+  └─ 1 ห้องมีประวัติการซ่อมหลายครั้ง
 
-Employee (1) ──→ (N) Maintenance   : 1 พนักงานรับผิดชอบงานซ่อมหลายงาน
+Customer (1) ──→ (N) Payment
+  └─ 1 ลูกค้ามีหลายบิล (รายเดือน)
+
+Customer (1) ──→ (N) Repair
+  └─ 1 ลูกค้าแจ้งซ่อมได้หลายครั้ง
+
+Employee (1) ──→ (N) Maintenance
+  └─ 1 พนักงานรับผิดชอบงานซ่อมหลายงาน
 ```
 
 ---
 
-## 📝 การใช้งาน
+## 📝 ตัวอย่างการใช้งาน
 
-### 1. สมัครสมาชิกและเข้าสู่ระบบ
+### 1️⃣ สมัครสมาชิกและเข้าสู่ระบบ
 
-#### สมัครสมาชิก
+#### สมัครสมาชิก (Register)
 ```bash
 POST /api/register
 Content-Type: application/json
@@ -552,7 +865,7 @@ Content-Type: application/json
 }
 ```
 
-#### เข้าสู่ระบบ
+#### เข้าสู่ระบบ (Login)
 ```bash
 POST /api/login
 Content-Type: application/json
@@ -575,7 +888,11 @@ Content-Type: application/json
 }
 ```
 
-### 2. สร้างห้องพัก
+> 💡 **เก็บ Token ไว้ใช้งาน:** นำ Token ที่ได้ไปใส่ใน Header: `Authorization: Bearer <token>` สำหรับ API ที่ต้องการ Authentication
+
+---
+
+### 2️⃣ สร้างห้องพัก
 
 ```bash
 POST /api/rooms
@@ -589,15 +906,18 @@ Authorization: Bearer <token>
   "Room_Size": 20.5,
   "Room_Price": 3000,
   "Room_Deposit": 3000,
-  "Description": "ห้องมาตรฐาน มีแอร์ ตู้เย็น"
+  "Description": "ห้องมาตรฐาน มีแอร์ ตู้เย็น เตียง ตู้เสื้อผ้า โต๊ะทำงาน"
 }
 ```
 
-### 3. เพิ่มลูกค้าใหม่ (Check-in)
+---
+
+### 3️⃣ เพิ่มลูกค้าใหม่ (Check-in)
 
 ```bash
 POST /api/customers
 Content-Type: application/json
+Authorization: Bearer <token>
 
 {
   "Customer_ID": "C001",
@@ -612,11 +932,14 @@ Content-Type: application/json
 }
 ```
 
-### 4. สร้างบิลค่าเช่า
+---
+
+### 4️⃣ สร้างบิลค่าเช่า
 
 ```bash
 POST /api/payments
 Content-Type: application/json
+Authorization: Bearer <token>
 
 {
   "Pay_ID": "PAY001",
@@ -638,11 +961,14 @@ Content-Type: application/json
 }
 ```
 
-### 5. แจ้งซ่อม
+---
+
+### 5️⃣ แจ้งซ่อม
 
 ```bash
 POST /api/repairs
 Content-Type: application/json
+Authorization: Bearer <token>
 
 {
   "Customer_ID": "C001",
@@ -657,257 +983,97 @@ Content-Type: application/json
 
 ## 🛠️ เครื่องมือสำหรับทดสอบ API
 
-### 1. ใช้ Postman
-- ดาวน์โหลด [Postman](https://www.postman.com/downloads/)
-- Import Collection และทดสอบ API
+### 1. Postman
+- ดาวน์โหลด: [postman.com/downloads](https://www.postman.com/downloads/)
+- Import Collection และทดสอบ API ได้ทันที
+- รองรับการเก็บ Token และ Environment Variables
 
-### 2. ใช้ cURL
+### 2. cURL (Command Line)
 ```bash
 # ทดสอบการเชื่อมต่อ
 curl http://localhost:3001/api
 
 # ดูห้องทั้งหมด
 curl http://localhost:3001/api/rooms
+
+# ดูห้องว่าง
+curl http://localhost:3001/api/rooms/available
+
+# Login
+curl -X POST http://localhost:3001/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@dormitory.com","password":"password123"}'
 ```
 
-### 3. ใช้ Prisma Studio (ดูข้อมูลในฐานข้อมูล)
+### 3. Prisma Studio (Database GUI)
 ```bash
 npx prisma studio
 ```
-เปิด Browser ที่ `http://localhost:5555`
-
----
-
-## 📂 โครงสร้างโปรเจกต์
-
-```
-react-server/
-├── controllers/            # 📁 ชั้น Business Logic - ประมวลผลข้อมูลและจัดการ Database
-│   ├── auth.js            # 🔐 จัดการการสมัครสมาชิก (Register) และเข้าสู่ระบบ (Login)
-│   │                      #    - ตรวจสอบข้อมูล email/password
-│   │                      #    - เข้ารหัสรหัสผ่านด้วย bcrypt
-│   │                      #    - สร้าง JWT Token สำหรับ Authentication
-│   │
-│   ├── customer.js        # 👤 จัดการข้อมูลลูกค้า/ผู้เช่า
-│   │                      #    - CRUD ลูกค้า (สร้าง, อ่าน, แก้ไข, ลบ)
-│   │                      #    - Check-in ลูกค้าเข้าพัก
-│   │                      #    - Check-out ลูกค้าออกจากหอพัก
-│   │                      #    - ดูลูกค้าที่อยู่ในหอ (status: active)
-│   │
-│   ├── employee.js        # 👷 จัดการข้อมูลพนักงาน
-│   │                      #    - CRUD พนักงาน (แม่บ้าน, รปภ., ช่างซ่อม)
-│   │                      #    - ดูพนักงานที่ทำงานอยู่
-│   │                      #    - อัพเดทสถานะพนักงาน (active/inactive/resigned)
-│   │
-│   ├── payment.js         # 💰 จัดการบิลค่าเช่าและการชำระเงิน
-│   │                      #    - สร้างบิลรายเดือน (ค่าเช่า, ค่าน้ำ, ค่าไฟ)
-│   │                      #    - คำนวณค่าใช้จ่ายทั้งหมด
-│   │                      #    - บันทึกการชำระเงิน (Paid/Unpaid/Partial)
-│   │                      #    - ดูบิลที่ค้างชำระ (Overdue)
-│   │
-│   ├── repair.js          # 🔧 จัดการรายการแจ้งซ่อม
-│   │                      #    - รับแจ้งซ่อมจากลูกค้า
-│   │                      #    - อัพเดทสถานะการซ่อม (Pending/In Progress/Completed)
-│   │                      #    - บันทึกค่าใช้จ่ายในการซ่อม
-│   │                      #    - ดูรายการซ่อมตามห้อง/สถานะ
-│   │
-│   ├── room.js            # 🏠 จัดการข้อมูลห้องพัก
-│   │                      #    - CRUD ห้องพัก
-│   │                      #    - อัพเดทสถานะห้อง (Available/Occupied/Maintenance)
-│   │                      #    - ดูห้องว่าง (Available rooms)
-│   │                      #    - จัดการข้อมูลราคาและสิ่งอำนวยความสะดวก
-│   │
-│   └── user.js            # 👥 จัดการผู้ใช้งานระบบ
-│                          #    - ดูรายชื่อ users ทั้งหมด
-│                          #    - แก้ไขข้อมูล user (email, role)
-│                          #    - ลบ user
-│                          #    - เปลี่ยนสิทธิ์ (ADMIN/USER/EMPLOYEE)
-│
-├── middleware/            # 🛡️ ชั้น Middleware - ตรวจสอบก่อนเข้าถึง Controller
-│   ├── auth.js           # 🔑 ตรวจสอบ JWT Token
-│   │                     #    - ดึง Token จาก Header (Authorization: Bearer <token>)
-│   │                     #    - Verify Token ว่าถูกต้องและยังไม่หมดอายุ
-│   │                     #    - แนบข้อมูล user ไปยัง req.user
-│   │                     #    - ป้องกัน Endpoint ที่ต้อง Authentication
-│   │
-│   └── user.js           # ✅ ตรวจสอบสิทธิ์ผู้ใช้ (Authorization)
-│                         #    - ตรวจสอบ Role (isAdmin, isEmployee)
-│                         #    - Validate ข้อมูลที่ส่งมา (Input Validation)
-│                         #    - ป้องกันการเข้าถึงข้อมูลที่ไม่มีสิทธิ์
-│
-├── routers/              # 🚦 ชั้น Routes - กำหนด Endpoint และเชื่อม Controller
-│   ├── auth.js          # เส้นทาง Authentication
-│   │                    #    POST /api/register → controllers/auth.js (register)
-│   │                    #    POST /api/login    → controllers/auth.js (login)
-│   │
-│   ├── customer.js      # เส้นทาง Customer APIs
-│   │                    #    GET    /api/customers                  → getAll
-│   │                    #    GET    /api/customers/active           → getActive
-│   │                    #    GET    /api/customers/:customerId      → getOne
-│   │                    #    POST   /api/customers                  → create
-│   │                    #    PATCH  /api/customers/:customerId      → update
-│   │                    #    PATCH  /api/customers/:id/checkout     → checkout
-│   │                    #    DELETE /api/customers/:customerId      → delete
-│   │
-│   ├── employee.js      # เส้นทาง Employee APIs
-│   │                    #    GET    /api/employees           → getAll
-│   │                    #    GET    /api/employees/active    → getActive
-│   │                    #    POST   /api/employees           → create
-│   │                    #    PATCH  /api/employees/:empId    → update
-│   │                    #    DELETE /api/employees/:empId    → delete
-│   │
-│   ├── payment.js       # เส้นทาง Payment APIs
-│   │                    #    GET    /api/payments                      → getAll
-│   │                    #    GET    /api/payments/unpaid               → getUnpaid
-│   │                    #    GET    /api/payments/room/:roomNumber     → getByRoom
-│   │                    #    POST   /api/payments                      → create
-│   │                    #    PATCH  /api/payments/:payId               → update
-│   │                    #    PATCH  /api/payments/:payId/pay           → markAsPaid
-│   │                    #    DELETE /api/payments/:payId               → delete
-│   │
-│   ├── repair.js        # เส้นทาง Repair APIs
-│   │                    #    GET    /api/repairs                       → getAll
-│   │                    #    GET    /api/repairs/pending               → getPending
-│   │                    #    GET    /api/repairs/room/:roomNumber      → getByRoom
-│   │                    #    POST   /api/repairs                       → create
-│   │                    #    PATCH  /api/repairs/:repairId             → update
-│   │                    #    PATCH  /api/repairs/:repairId/status      → updateStatus
-│   │                    #    DELETE /api/repairs/:repairId             → delete
-│   │
-│   ├── room.js          # เส้นทาง Room APIs
-│   │                    #    GET    /api/rooms                  → getAll
-│   │                    #    GET    /api/rooms/available        → getAvailable
-│   │                    #    GET    /api/rooms/:roomNumber      → getOne
-│   │                    #    POST   /api/rooms                  → create
-│   │                    #    PATCH  /api/rooms/:roomNumber      → update
-│   │                    #    DELETE /api/rooms/:roomNumber      → delete
-│   │
-│   └── user.js          # เส้นทาง User APIs
-│                        #    GET    /api/users          → getAll
-│                        #    GET    /api/auth/users     → getAllWithAuth (ต้อง Token)
-│                        #    PATCH  /api/users/:userId  → update
-│                        #    DELETE /api/users/:userId  → delete
-│
-├── prisma/              # 🗄️ Prisma ORM - จัดการ Database Schema
-│   ├── schema.prisma   # 📋 ไฟล์กำหนดโครงสร้างฐานข้อมูล
-│   │                   #    - กำหนด Models ทั้งหมด (16 ตาราง)
-│   │                   #    - กำหนด Relations ระหว่างตาราง
-│   │                   #    - กำหนด Enums (RoomStatus, PaymentStatus, etc.)
-│   │                   #    - ตั้งค่า Database connection (MySQL)
-│   │
-│   └── migrations/     # 📂 ประวัติการเปลี่ยนแปลง Schema (ถ้ามี)
-│
-├── node_modules/        # 📦 Dependencies ที่ติดตั้งจาก npm
-│
-├── .env                 # 🔐 Environment Variables (ห้ามเอาขึ้น Git!)
-│                        #    DATABASE_URL - URL เชื่อมต่อฐานข้อมูล MySQL
-│                        #    JWT_SECRET   - Key สำหรับเข้ารหัส JWT (ถ้ามี)
-│                        #    PORT         - Port ที่ server จะรัน
-│
-├── .gitignore           # 🚫 ไฟล์ที่ไม่ต้องการให้เข้า Git
-│                        #    - node_modules/
-│                        #    - .env
-│                        #    - ไฟล์ log
-│
-├── docker-compose.yml   # 🐳 ตั้งค่า Docker Container สำหรับ MySQL
-│                        #    - Image: mysql:8.0
-│                        #    - Database: dormitory
-│                        #    - Port: 3306
-│                        #    - Credentials: root/root123
-│
-├── package.json         # 📋 ข้อมูลโปรเจกต์และ Dependencies
-│                        #    - express         : Web Framework
-│                        #    - @prisma/client  : Prisma ORM Client
-│                        #    - bcrypt          : เข้ารหัสรหัสผ่าน
-│                        #    - jsonwebtoken    : สร้าง/ตรวจสอบ JWT
-│                        #    - cors            : อนุญาต Cross-Origin
-│                        #    - morgan          : HTTP Logger
-│                        #    - nodemon         : Auto-restart server
-│
-├── package-lock.json    # 🔒 Lock versions ของ dependencies
-│
-└── server.js            # ⚙️ ไฟล์หลักของ Server - Entry Point
-                         #    - สร้าง Express app
-                         #    - ตั้งค่า Middleware (morgan, body-parser, cors)
-                         #    - โหลด Routers ทั้งหมดจากโฟลเดอร์ routers/
-                         #    - Listen ที่ Port 3001
-                         #    - แสดงรายการ API Endpoints ทั้งหมด
-```
-
----
-
-## 🔄 การทำงานของระบบ (Request Flow)
-
-เมื่อ Client ส่ง Request มายัง API จะมีการทำงานผ่านขั้นตอนดังนี้:
-
-```
-1. Client ส่ง HTTP Request
-   ↓
-2. server.js รับ Request
-   ↓
-3. Middleware ประมวลผล
-   ├─ morgan: บันทึก log
-   ├─ body-parser: แปลง JSON
-   ├─ cors: ตรวจสอบ origin
-   └─ middleware/auth.js: ตรวจสอบ Token (ถ้าต้องการ)
-   ↓
-4. Router เลือก Endpoint ที่ตรงกับ URL
-   ↓
-5. Controller ประมวลผล Business Logic
-   ├─ ตรวจสอบข้อมูล
-   ├─ เชื่อมต่อ Database ผ่าน Prisma Client
-   ├─ ดึงข้อมูล/สร้าง/แก้ไข/ลบ
-   └─ ส่ง Response กลับ
-   ↓
-6. Client ได้รับ Response (JSON)
-```
-
-### ตัวอย่างการทำงาน: สร้างลูกค้าใหม่
-
-```
-POST /api/customers
-↓
-server.js → routers/customer.js → controllers/customer.js
-↓
-1. ตรวจสอบข้อมูลที่ส่งมา
-2. เช็คว่าห้องว่างหรือไม่ (Room.findUnique)
-3. สร้างลูกค้า (Customer.create)
-4. อัพเดทสถานะห้องเป็น OCCUPIED
-5. ส่ง Response กลับ { success: true, customer: {...} }
-```
+เปิด Browser ที่ `http://localhost:5555` เพื่อดูและแก้ไขข้อมูลในฐานข้อมูลแบบ GUI
 
 ---
 
 ## 🔒 Security
 
-- **Authentication**: ใช้ JWT (JSON Web Token)
-- **Password**: เข้ารหัสด้วย bcrypt
-- **CORS**: เปิดใช้งานสำหรับ Cross-Origin Requests
-- **Environment Variables**: ข้อมูลสำคัญเก็บใน `.env`
+ระบบมีมาตรการรักษาความปลอดภัยดังนี้:
+
+| ส่วนประกอบ | เทคโนโลยี | คำอธิบาย |
+|------------|-----------|----------|
+| **Authentication** | JWT (JSON Web Token) | ใช้ Token ในการยืนยันตัวตน ไม่ต้องเก็บ Session บน Server |
+| **Password Hashing** | bcrypt | เข้ารหัสรหัสผ่านก่อนเก็บลงฐานข้อมูล (One-way encryption) |
+| **CORS** | cors middleware | ควบคุมการเข้าถึง API จาก Domain อื่น |
+| **Environment Variables** | .env file | ข้อมูลสำคัญเก็บแยก ไม่เอาขึ้น Git |
+| **Input Validation** | Middleware | ตรวจสอบข้อมูลที่ส่งเข้ามาก่อนประมวลผล |
+
+### 🔑 การใช้งาน JWT Token
+
+1. Login เพื่อรับ Token
+2. นำ Token ไปใส่ใน Header ของ Request ถัดไป:
+   ```
+   Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   ```
+3. Server จะตรวจสอบ Token และดึงข้อมูล User จาก Token
 
 ---
 
 ## 🐛 การแก้ไขปัญหา
 
-### ปัญหา: เชื่อมต่อฐานข้อมูลไม่ได้
+### ❌ ปัญหา: เชื่อมต่อฐานข้อมูลไม่ได้
+
+**อาการ:** `Error: P1001: Can't reach database server`
 
 **วิธีแก้:**
+
 1. ตรวจสอบว่า Docker กำลังทำงาน
 ```bash
 docker ps
 ```
 
-2. ตรวจสอบ Container MySQL
+2. ตรวจสอบ Log ของ MySQL Container
 ```bash
 docker-compose logs mysql
 ```
 
 3. ตรวจสอบ `.env` ว่า DATABASE_URL ถูกต้อง
+```env
+DATABASE_URL="mysql://root:root123@localhost:3306/dormitory"
+```
 
-### ปัญหา: Port 3001 ถูกใช้งานอยู่
+4. Restart Docker Container
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+---
+
+### ❌ ปัญหา: Port 3001 ถูกใช้งานอยู่
+
+**อาการ:** `Error: listen EADDRINUSE: address already in use :::3001`
 
 **วิธีแก้:**
-แก้ไข `server.js` เปลี่ยน PORT หรือหยุด process ที่ใช้ Port อยู่
+
+**Option 1:** หยุด process ที่ใช้ Port 3001
 
 ```bash
 # macOS/Linux
@@ -918,12 +1084,45 @@ netstat -ano | findstr :3001
 taskkill /PID <PID> /F
 ```
 
-### ปัญหา: Prisma Schema ไม่ sync กับฐานข้อมูล
+**Option 2:** เปลี่ยน Port ใน `server.js`
+```javascript
+const PORT = process.env.PORT || 3002; // เปลี่ยนจาก 3001 เป็น 3002
+```
+
+---
+
+### ❌ ปัญหา: Prisma Schema ไม่ sync กับฐานข้อมูล
+
+**อาการ:** Table ในฐานข้อมูลไม่ตรงกับ Schema หรือไม่มี Table
 
 **วิธีแก้:**
+
 ```bash
+# 1. Generate Prisma Client ใหม่
 npx prisma generate
+
+# 2. Push Schema ไปยัง Database
 npx prisma db push
+
+# 3. หากต้องการรีเซ็ตฐานข้อมูล (ข้อมูลจะหายทั้งหมด!)
+npx prisma db push --force-reset
+```
+
+---
+
+### ❌ ปัญหา: JWT Token หมดอายุ
+
+**อาการ:** `Error: jwt expired`
+
+**วิธีแก้:**
+- Login ใหม่เพื่อรับ Token ใหม่
+- ถ้าต้องการเพิ่มเวลาหมดอายุ แก้ไขใน `controllers/auth.js`:
+```javascript
+const token = jwt.sign(
+  { userId: user.id, email: user.email },
+  "secret-key",
+  { expiresIn: "7d" } // เพิ่มจาก 24h เป็น 7 วัน
+);
 ```
 
 ---
@@ -931,12 +1130,14 @@ npx prisma db push
 ## 📞 ติดต่อ & สนับสนุน
 
 หากพบปัญหาหรือต้องการสอบถาม สามารถติดต่อได้ที่:
-- Email: support@dormitory.com
-- GitHub Issues: [สร้าง Issue](https://github.com/your-repo/issues)
+
+- 📧 Email: support@dormitory.com
+- 🐛 GitHub Issues: [สร้าง Issue](https://github.com/your-repo/issues)
+- 📚 Documentation: README.md (ไฟล์นี้)
 
 ---
 
-## �� License
+## 📄 License
 
 MIT License - ใช้งานได้เสรี
 
@@ -944,13 +1145,31 @@ MIT License - ใช้งานได้เสรี
 
 ## 🎯 สิ่งที่ควรพัฒนาต่อ
 
-- [ ] เพิ่มระบบ Upload รูปภาพ
-- [ ] เพิ่มระบบแจ้งเตือนผ่าน Line Notify
-- [ ] เพิ่มระบบออกรายงาน (PDF)
+- [ ] เพิ่มระบบ Upload รูปภาพ (ห้องพัก, โปรไฟล์)
+- [ ] เพิ่มระบบแจ้งเตือนผ่าน Line Notify (บิลครบกำหนด, แจ้งซ่อม)
+- [ ] เพิ่มระบบออกรายงาน PDF (บิล, สัญญา)
 - [ ] เพิ่ม API สำหรับตารางอื่นๆ ที่ยังไม่ได้ใช้งาน
-- [ ] เพิ่ม Unit Testing
-- [ ] Deploy ขึ้น Cloud (AWS, Azure, GCP)
+  - Announcement (ประกาศ)
+  - VisitorLog (บันทึกผู้เข้า-ออก)
+  - MeterReading (บันทึกมิเตอร์)
+  - Contract (สัญญาเช่า)
+  - Booking (จองห้อง)
+- [ ] เพิ่ม Unit Testing & Integration Testing
+- [ ] เพิ่ม API Documentation ด้วย Swagger/OpenAPI
+- [ ] เพิ่ม Rate Limiting (จำกัดจำนวน Request)
+- [ ] เพิ่ม Logging System (Winston, Morgan)
+- [ ] Deploy ขึ้น Cloud Platform (AWS, Azure, GCP, Heroku)
 
 ---
 
+<div align="center">
+
 **สร้างด้วย ❤️ สำหรับการจัดการหอพักที่มีประสิทธิภาพ**
+
+⭐ ถ้าชอบโปรเจกต์นี้ อย่าลืม Star ให้ด้วยนะ! ⭐
+
+---
+
+**Tech Stack:** Node.js | Express | Prisma | MySQL | Docker | JWT
+
+</div>
