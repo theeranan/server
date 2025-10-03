@@ -116,11 +116,35 @@ exports.update = async (req, res) => {
     const { payId } = req.params;
     const data = req.body;
 
+    // แปลงค่าที่เป็นตัวเลขให้เป็น Int
+    const updateData = {
+      ...data,
+      Year: data.Year ? parseInt(data.Year) : data.Year,
+      Rental: data.Rental ? parseInt(data.Rental) : data.Rental,
+      WaterSupply: data.WaterSupply ? parseInt(data.WaterSupply) : data.WaterSupply,
+      TotalWater: data.TotalWater ? parseInt(data.TotalWater) : data.TotalWater,
+      ElectricitySupply: data.ElectricitySupply ? parseInt(data.ElectricitySupply) : data.ElectricitySupply,
+      TotalElec: data.TotalElec ? parseInt(data.TotalElec) : data.TotalElec,
+      Internet: data.Internet ? parseInt(data.Internet) : data.Internet,
+      Other: data.Other ? parseInt(data.Other) : data.Other,
+      FineDay: data.FineDay ? parseInt(data.FineDay) : data.FineDay,
+      TotalFine: data.TotalFine ? parseInt(data.TotalFine) : data.TotalFine,
+      Paid: data.Paid ? parseInt(data.Paid) : data.Paid,
+      TotalRental: data.TotalRental ? parseInt(data.TotalRental) : data.TotalRental,
+      DayPaid: data.DayPaid ? new Date(data.DayPaid) : data.DayPaid,
+      DueDate: data.DueDate ? new Date(data.DueDate) : data.DueDate,
+    };
+
+    // ลบฟิลด์ที่ไม่ควรอัพเดท
+    delete updateData.customer;
+    delete updateData.createdAt;
+    delete updateData.updatedAt;
+
     const updatedPayment = await prisma.payment.update({
       where: {
         Pay_ID: payId,
       },
-      data,
+      data: updateData,
     });
 
     res.json({ message: "Payment updated successfully", payment: updatedPayment });

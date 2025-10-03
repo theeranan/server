@@ -83,6 +83,15 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: "Room is not available" });
     }
 
+    // ตรวจสอบ Customer_ID ซ้ำ
+    const existingCustomer = await prisma.customer.findUnique({
+      where: { Customer_ID },
+    });
+
+    if (existingCustomer) {
+      return res.status(400).json({ message: "Customer ID already exists" });
+    }
+
     // สร้างลูกค้าและอัพเดทสถานะห้อง
     const newCustomer = await prisma.$transaction(async (tx) => {
       const customer = await tx.customer.create({
